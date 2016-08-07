@@ -1,14 +1,22 @@
 /// <reference path="glbp.ts" />
 
+
+/*** region initialisation */
 let gl = glbp.createGlContext("gl-canvas");
 let program = glbp.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
+gl.useProgram(program);
 
 
-// get attirbutes/uniforms
-var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-var colorLocation = gl.getUniformLocation(program, "u_color");
+let pa_position = gl.getAttribLocation(program, "a_position");
 
+var uniformSetters = glbp.createUniformSetters(gl, program);
+
+var uniforms = {
+    u_resolution: [gl.canvas.width, gl.canvas.height],
+    // u_color: [Math.random(), Math.random(), Math.random(), 1]
+};
+
+glbp.setUniforms(uniformSetters, uniforms);
 
 // create a buffer
 var positionBuffer = gl.createBuffer();
@@ -27,7 +35,7 @@ var positions = [
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
 // enable attribute
-gl.enableVertexAttribArray(positionAttributeLocation);
+gl.enableVertexAttribArray(pa_position);
 
 // specify data format
 var size = 2;           // 2 components per iteration
@@ -35,18 +43,16 @@ var type = gl.FLOAT;    // 32bit float
 var normalize = false;  // dont normalize the data
 var stride = 0;         // 0 = move forward size * sizeof(type) each iteration to get the next position
 var offset = 0;         // start at beginning of the buffer
-gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
+gl.vertexAttribPointer(pa_position, size, type, normalize, stride, offset);
 
 
 // set the viewport
 gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-// which program to execute
-gl.useProgram(program);
 
 
 // set resolution
-gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+// gl.uniform2f(pu_resolution, gl.canvas.width, gl.canvas.height);
 
 // create a rectangle
 function setRectangle(gl, x, y, width, height) {
@@ -79,7 +85,9 @@ for (var ii = 0; ii < 50; ++ii) {
     setRectangle(gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
 
     // set up random color
-    gl.uniform4f(colorLocation, Math.random(), Math.random(), Math.random(), 1);
+    // gl.uniform4f(pu_color, Math.random(), Math.random(), Math.random(), 1);
+
+    glbp.setUniforms(uniformSetters, { u_color: [Math.random(), Math.random(), Math.random(), 1]})
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
