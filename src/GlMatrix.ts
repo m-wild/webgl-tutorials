@@ -1,12 +1,18 @@
 class GlMatrix {
 
-
+    public static identity(): Float32Array {
+        return new Float32Array([
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1
+        ]);
+    }
 
     public static translation(tx: number, ty: number): Float32Array {
         return new Float32Array([
             1, 0, 0,
             0, 1, 0,
-            tx, ty, 0
+            tx, ty, 1
         ]);
     }
 
@@ -63,6 +69,11 @@ class GlMatrix {
 
     public static matrixMultiply3(a: Float32Array, b: Float32Array, c: Float32Array): Float32Array {
         return this.matrixMultiply(this.matrixMultiply(a, b), c);
+    }
+
+
+    public static matrixMultiply4(a: Float32Array, b: Float32Array, c: Float32Array, d: Float32Array): Float32Array {
+        return this.matrixMultiply(this.matrixMultiply(this.matrixMultiply(a, b), c), d);
     }
 
 }
