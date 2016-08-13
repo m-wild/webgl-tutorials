@@ -1,0 +1,9 @@
+html {
+    font-family: Consolas, Menlo, monospace;
+    font-size: small;
+    background-color: #fbfbfb;
+}
+canvas {
+    border: 1px solid #e6e6e6;
+    background-color: #fff;
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+        <style type="text/css">
+        input {
+            width: 380px;
+        }
+        </style>
+    </head>
+    <body>
+        <p><a href="../../">&lt; index</a></p>
+
+        <canvas id="gl-canvas" width="400" height="400"></canvas>
+
+        <p>tx:<input id="gl-x" type="range" min="0" max="400" oninput="update();"/></p>
+        <p>ty:<input id="gl-y" type="range" min="0" max="400" oninput="update();"/></p>
+        <p>r: <input id="gl-r" type="range" min="0" max="360" oninput="update();"/></p>
+        <p>sx:<input id="gl-sx" type="range" min="-5" max="5" step="0.01" oninput="update();"/></p>
+        <p>sy:<input id="gl-sy" type="range" min="-5" max="5" step="0.01" oninput="update();"/></p>
+        <button onclick="newColor(true);">Color</button>
+
+
+        <script id="gl-vertexShader" type="glsl">
+            attribute vec2 a_position;
+
+            uniform vec2 u_resolution;
+            uniform mat3 u_matrix;
+
+            void main() {
+                
+                vec2 position = (u_matrix * vec3(a_position, 1)).xy;
+
+                // convert the position from pixels 
+                vec2 clipspace = (((
+                    position / u_resolution)    // to 0->1
+                    * 2.0)                      // then to 0->2
+                    - 1.0)                      // then to -1->+1 (clipspace)
+                    * vec2(1, -1);              // then flip y-axis
+                
+                gl_Position = vec4(clipspace, 0, 1);
+            }       
+        </script>
+        
+        <script id="gl-fragmentShader" type="glsl">
+            precision mediump float;
+            uniform vec4 u_color;
+
+            void main() {
+                gl_FragColor = u_color;
+            }
+        </script>
+
+        <script src="../../js/1/index.js" type="text/javascript"></script>
+    </body>
+</html>
