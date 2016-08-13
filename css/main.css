@@ -7,3 +7,6 @@ canvas {
     border: 1px solid #e6e6e6;
     background-color: #fff;
 }
+a         { color: #8494c1; text-decoration: none; }
+a:visited { color: #ae84c1; }
+a:hover   { color: #5b6786; text-decoration: underline; }
