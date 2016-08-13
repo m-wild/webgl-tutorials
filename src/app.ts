@@ -107,8 +107,13 @@ function update() {
 }
 
 
+function newColor() {
+    gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
+    update();
+}
 
 // set up random color
 gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
 
 update();
+
