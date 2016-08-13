@@ -16,6 +16,8 @@
         <p>x:<input id="gl-x" type="range" min="0" max="400" onchange="update();"/></p>
         <p>y:<input id="gl-y" type="range" min="0" max="400" onchange="update();"/></p>
         <p>r:<input id="gl-r" type="range" min="0" max="360" onchange="update();"/></p>
+        <p>sx:<input id="gl-sx" type="range" min="-5" max="5" onchange="update();"/></p>
+        <p>sy:<input id="gl-sy" type="range" min="-5" max="5" onchange="update();"/></p>
 
 
         <script id="gl-vertexShader" type="glsl">
@@ -24,12 +26,15 @@
             uniform vec2 u_resolution;
             uniform vec2 u_translation;
             uniform vec2 u_rotation;
+            uniform vec2 u_scale;
 
             void main() {
                 
+                vec2 scaled = a_position * u_scale;
+
                 vec2 rotated = vec2(
-                    a_position.x * u_rotation.y + a_position.y * u_rotation.x,
-                    a_position.y * u_rotation.y - a_position.x * u_rotation.x);
+                    scaled.x * u_rotation.y + scaled.y * u_rotation.x,
+                    scaled.y * u_rotation.y - scaled.x * u_rotation.x);
 
                 vec2 translated = rotated + u_translation;
                     

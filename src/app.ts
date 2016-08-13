@@ -16,6 +16,7 @@ let u_resolution = gl.getUniformLocation(program, "u_resolution");
 let u_color = gl.getUniformLocation(program, "u_color");
 let u_translation = gl.getUniformLocation(program, "u_translation");
 let u_rotation = gl.getUniformLocation(program, "u_rotation");
+let u_scale = gl.getUniformLocation(program, "u_scale");
 
 // get attributes
 let a_position = GlAttribute.get(program, "a_position", 2);
@@ -82,15 +83,25 @@ let r = 0;
 let r_input = <HTMLInputElement> document.getElementById("gl-r");
 r_input.value = String(r);
 
+let sx = 1;
+let sx_input = <HTMLInputElement> document.getElementById("gl-sx");
+sx_input.value = String(sx);
+
+let sy = 1;
+let sy_input = <HTMLInputElement> document.getElementById("gl-sy");
+sy_input.value = String(sy);
 
 function update() {
     x = Number(x_input.value);
     y = Number(y_input.value);
-    r = Number(r_input.value) * Math.PI / 180;
-
     gl.uniform2f(u_translation, x, y);
 
+    r = Number(r_input.value) * Math.PI / 180;
     gl.uniform2f(u_rotation, Math.sin(r), Math.cos(r));
+
+    sx = Number(sx_input.value);
+    sy = Number(sy_input.value);
+    gl.uniform2fv(u_scale, new Float32Array([sx, sy]));
 
     drawScene();
 }
