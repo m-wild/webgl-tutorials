@@ -5,25 +5,37 @@
             html {
                 font-family: Consolas, monospace;
             }
+            input {
+                width: 400px;
+            }
         </style>
     </head>
     <body>
         <canvas id="gl-canvas" width="400" height="400"></canvas>
 
-        <p>x:<input id="gl-x" type="range" min="0" max="400" oninput="update();"/></p>
-        <p>y:<input id="gl-y" type="range" min="0" max="400" oninput="update()"/></p>
+        <p>x:<input id="gl-x" type="range" min="0" max="400" onchange="update();"/></p>
+        <p>y:<input id="gl-y" type="range" min="0" max="400" onchange="update();"/></p>
+        <p>r:<input id="gl-r" type="range" min="0" max="360" onchange="update();"/></p>
 
 
         <script id="gl-vertexShader" type="glsl">
             attribute vec2 a_position;
+
             uniform vec2 u_resolution;
             uniform vec2 u_translation;
+            uniform vec2 u_rotation;
 
             void main() {
+                
+                vec2 rotated = vec2(
+                    a_position.x * u_rotation.y + a_position.y * u_rotation.x,
+                    a_position.y * u_rotation.y - a_position.x * u_rotation.x);
+
+                vec2 translated = rotated + u_translation;
+                    
                 // convert the position from pixels 
-                vec2 clipspace = ((((
-                    a_position + u_translation)
-                    / u_resolution)  // to 0->1
+                vec2 clipspace = (((
+                    translated / u_resolution)  // to 0->1
                     * 2.0)                      // then to 0->2
                     - 1.0)                      // then to -1->+1 (clipspace)
                     * vec2(1, -1);              // then flip y-axis

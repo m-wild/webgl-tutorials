@@ -15,21 +15,13 @@ gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 let u_resolution = gl.getUniformLocation(program, "u_resolution");
 let u_color = gl.getUniformLocation(program, "u_color");
 let u_translation = gl.getUniformLocation(program, "u_translation");
+let u_rotation = gl.getUniformLocation(program, "u_rotation");
 
 // get attributes
 let a_position = GlAttribute.get(program, "a_position", 2);
 
 // set resolution
 gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-
-
-let x = 0;
-let x_input = <HTMLInputElement> document.getElementById("gl-x");
-x_input.value = String(x);
-
-let y = 0;
-let y_input = <HTMLInputElement> document.getElementById("gl-y");
-y_input.value = String(y);
 
 
 
@@ -77,14 +69,33 @@ function drawScene() {
 }
 
 
+
+let x = 0;
+let x_input = <HTMLInputElement> document.getElementById("gl-x");
+x_input.value = String(x);
+
+let y = 0;
+let y_input = <HTMLInputElement> document.getElementById("gl-y");
+y_input.value = String(y);
+
+let r = 0;
+let r_input = <HTMLInputElement> document.getElementById("gl-r");
+r_input.value = String(r);
+
+
 function update() {
     x = Number(x_input.value);
     y = Number(y_input.value);
+    r = Number(r_input.value) * Math.PI / 180;
 
     gl.uniform2f(u_translation, x, y);
 
-    drawScene(); 
+    gl.uniform2f(u_rotation, Math.sin(r), Math.cos(r));
+
+    drawScene();
 }
+
+
 
 // set up random color
 gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
