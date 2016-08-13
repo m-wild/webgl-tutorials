@@ -1,6 +1,7 @@
 /// <reference path="GlInit.ts" />
 /// <reference path="util.ts" />
 /// <reference path="GlAttribute.ts" />
+/// <reference path="GlMatrix.ts" />
 
 
 // --- initialization
@@ -14,9 +15,7 @@ gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 // get uniforms
 let u_resolution = gl.getUniformLocation(program, "u_resolution");
 let u_color = gl.getUniformLocation(program, "u_color");
-let u_translation = gl.getUniformLocation(program, "u_translation");
-let u_rotation = gl.getUniformLocation(program, "u_rotation");
-let u_scale = gl.getUniformLocation(program, "u_scale");
+let u_matrix = gl.getUniformLocation(program, "u_matrix");
 
 // get attributes
 let a_position = GlAttribute.get(program, "a_position", 2);
@@ -71,13 +70,13 @@ function drawScene() {
 
 
 
-let x = 0;
-let x_input = <HTMLInputElement> document.getElementById("gl-x");
-x_input.value = String(x);
+let tx = 0;
+let tx_input = <HTMLInputElement> document.getElementById("gl-x");
+tx_input.value = String(tx);
 
-let y = 0;
-let y_input = <HTMLInputElement> document.getElementById("gl-y");
-y_input.value = String(y);
+let ty = 0;
+let ty_input = <HTMLInputElement> document.getElementById("gl-y");
+ty_input.value = String(ty);
 
 let r = 0;
 let r_input = <HTMLInputElement> document.getElementById("gl-r");
@@ -92,16 +91,21 @@ let sy_input = <HTMLInputElement> document.getElementById("gl-sy");
 sy_input.value = String(sy);
 
 function update() {
-    x = Number(x_input.value);
-    y = Number(y_input.value);
-    gl.uniform2f(u_translation, x, y);
+    tx = Number(tx_input.value);
+    ty = Number(ty_input.value);
 
-    r = Number(r_input.value) * Math.PI / 180;
-    gl.uniform2f(u_rotation, Math.sin(r), Math.cos(r));
+    let translation = GlMatrix.translation(tx, ty);
+    
+    r = Number(r_input.value);
+    let rotation = GlMatrix.rotation(r);
 
     sx = Number(sx_input.value);
     sy = Number(sy_input.value);
-    gl.uniform2fv(u_scale, new Float32Array([sx, sy]));
+    let scale = GlMatrix.scale(sx, sy);
+
+    let mat = GlMatrix.matrixMultiply3(scale, rotation, translation);
+    
+    gl.uniformMatrix3fv(u_matrix, false, mat);
 
     drawScene();
 }
