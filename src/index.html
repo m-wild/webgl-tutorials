@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
-    <head></head>
+    <head>
+        <style type="text/css">
+            html {
+                font-family: Consolas, monospace;
+            }
+        </style>
+    </head>
     <body>
         <canvas id="gl-canvas" width="400" height="400"></canvas>
 
-        <input id="gl-x" type="number" onchange="update();"/>
-        <input id="gl-y" type="number" onchange="update()"/>
-        
+        <p>x:<input id="gl-x" type="range" min="0" max="400" oninput="update();"/></p>
+        <p>y:<input id="gl-y" type="range" min="0" max="400" oninput="update()"/></p>
 
 
         <script id="gl-vertexShader" type="glsl">

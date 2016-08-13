@@ -71,8 +71,6 @@ function drawScene() {
     a_position.data = setGeometry();
     a_position.buff();
 
-    // set up random color
-    gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
 
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
 
@@ -88,5 +86,7 @@ function update() {
     drawScene(); 
 }
 
+// set up random color
+gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
 
 update();
