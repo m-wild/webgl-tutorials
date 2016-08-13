@@ -29,13 +29,13 @@ setGeometry();
 
 newColor(false);
 
-let translation = [0, 0];
+let translation = [100, 100];
 let rotation = 0;
 let scale = [1, 1];
 
 // initialize inputs
-let tx_input = <HTMLInputElement> document.getElementById("gl-x");
-let ty_input = <HTMLInputElement> document.getElementById("gl-y");
+let tx_input = <HTMLInputElement> document.getElementById("gl-tx");
+let ty_input = <HTMLInputElement> document.getElementById("gl-ty");
 let r_input = <HTMLInputElement> document.getElementById("gl-r");
 let sx_input = <HTMLInputElement> document.getElementById("gl-sx");
 let sy_input = <HTMLInputElement> document.getElementById("gl-sy");

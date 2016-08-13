@@ -197,12 +197,12 @@ var a_position = GlAttribute.get(program, "a_position", 2);
 // set the geometry
 setGeometry();
 newColor(false);
-var translation = [0, 0];
+var translation = [100, 100];
 var rotation = 0;
 var scale = [1, 1];
 // initialize inputs
-var tx_input = document.getElementById("gl-x");
-var ty_input = document.getElementById("gl-y");
+var tx_input = document.getElementById("gl-tx");
+var ty_input = document.getElementById("gl-ty");
 var r_input = document.getElementById("gl-r");
 var sx_input = document.getElementById("gl-sx");
 var sy_input = document.getElementById("gl-sy");
