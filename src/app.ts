@@ -1,32 +1,29 @@
-/// <reference path="glbp.ts" />
+/// <reference path="GlInit.ts" />
+/// <reference path="util.ts" />
+/// <reference path="GlAttribute.ts" />
 
 
-/*** region initialisation */
-let glinit = glInit.init("gl-canvas", "gl-vertexShader", "gl-fragmentShader");
-let gl = glinit.gl;
-let program = glinit.program;
+// --- initialization
 
-let pa_position = gl.getAttribLocation(program, "a_position");
+let gl = GlInit.createGlContext("gl-canvas");
+let program = GlInit.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
+gl.useProgram(program);
 
-var uniformSetters = glbp.createUniformSetters(gl, program);
+gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-var uniforms = { u_resolution: [gl.canvas.width, gl.canvas.height] };
+// get uniforms
+let u_resolution = gl.getUniformLocation(program, "u_resolution");
+let u_color = gl.getUniformLocation(program, "u_color");
 
-glbp.setUniforms(uniformSetters, uniforms);
+// get attributes
+let a_position = GlAttribute.get(program, "a_position", 2);
 
-// create a buffer
-var positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);        
-// enable attribute
-gl.enableVertexAttribArray(pa_position);
 
-// specify data format
-var size = 2;           // 2 components per iteration
-var type = gl.FLOAT;    // 32bit float
-var normalize = false;  // dont normalize the data
-var stride = 0;         // 0 = move forward size * sizeof(type) each iteration to get the next position
-var offset = 0;         // start at beginning of the buffer
-gl.vertexAttribPointer(pa_position, size, type, normalize, stride, offset);
+// set resolution
+gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
+
+
+
 
 
 // create a rectangle
@@ -36,33 +33,28 @@ function setRectangle(gl, x, y, width, height) {
     var y1 = y;
     var y2 = y + height;
 
-    // NOTE: gl.bufferData(gl.ARRAY_BUFFER, ...) will affect
-    // whatever buffer is bound to the `ARRAY_BUFFER` bind point
-    // but so far we only have one buffer. If we had more than one
-    // buffer we'd want to bind that buffer to `ARRAY_BUFFER` first.
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    return new Float32Array([
         x1, y1,
         x2, y1,
         x1, y2,
         x1, y2,
         x2, y1,
-        x2, y2]), gl.STATIC_DRAW);
-
+        x2, y2]);
 }
 
-function randomInt(range) {
-    return Math.floor(Math.random() * range);
-}
+// bind the position attribute to gl.ARRAY_BUFFER
+a_position.bind();
 
 // buffer 50 random rectangles in random colors
 for (var ii = 0; ii < 50; ++ii) {
+
+
     // set up random rectangle
-    setRectangle(gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
+    a_position.data = setRectangle(gl, util.randomInt(300), util.randomInt(300), util.randomInt(300), util.randomInt(300));
+    a_position.buff();
 
     // set up random color
-    // gl.uniform4f(pu_color, Math.random(), Math.random(), Math.random(), 1);
-
-    glbp.setUniforms(uniformSetters, { u_color: [Math.random(), Math.random(), Math.random(), 1]})
+    gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
