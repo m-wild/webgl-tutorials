@@ -2,38 +2,21 @@
 
 
 /*** region initialisation */
-let gl = glbp.createGlContext("gl-canvas");
-let program = glbp.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
-gl.useProgram(program);
-
+let glinit = glInit.init("gl-canvas", "gl-vertexShader", "gl-fragmentShader");
+let gl = glinit.gl;
+let program = glinit.program;
 
 let pa_position = gl.getAttribLocation(program, "a_position");
 
 var uniformSetters = glbp.createUniformSetters(gl, program);
 
-var uniforms = {
-    u_resolution: [gl.canvas.width, gl.canvas.height],
-    // u_color: [Math.random(), Math.random(), Math.random(), 1]
-};
+var uniforms = { u_resolution: [gl.canvas.width, gl.canvas.height] };
 
 glbp.setUniforms(uniformSetters, uniforms);
 
 // create a buffer
 var positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);        
-
-// some 2d points
-var positions = [
-    10, 20,
-    80, 20,
-    10, 30,
-    10, 30,
-    80, 20,
-    80, 30,
-];
-// add them to the buffer
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
 // enable attribute
 gl.enableVertexAttribArray(pa_position);
 
@@ -45,14 +28,6 @@ var stride = 0;         // 0 = move forward size * sizeof(type) each iteration t
 var offset = 0;         // start at beginning of the buffer
 gl.vertexAttribPointer(pa_position, size, type, normalize, stride, offset);
 
-
-// set the viewport
-gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-
-
-// set resolution
-// gl.uniform2f(pu_resolution, gl.canvas.width, gl.canvas.height);
 
 // create a rectangle
 function setRectangle(gl, x, y, width, height) {

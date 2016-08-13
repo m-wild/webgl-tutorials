@@ -1,5 +1,6 @@
 class glbp {
 
+
     /** Compiles shader source code */
     public static compileShader(gl: WebGLRenderingContext, shaderSource: string, shaderType: number): WebGLShader {
         let shader = gl.createShader(shaderType);
@@ -76,7 +77,7 @@ class glbp {
 
 
     /** Creates a uniform setter function for the provided uniformInfo */
-    private static createUniformSetter(program: WebGLProgram, uniformInfo: WebGLActiveInfo) 
+    private static createUniformSetter(gl: WebGLRenderingContext, program: WebGLProgram, uniformInfo: WebGLActiveInfo) 
         : (any) => void {
         let location = gl.getUniformLocation(program, uniformInfo.name);
         let type = uniformInfo.type;
@@ -149,7 +150,7 @@ class glbp {
                 name = name.substr(0, name.length - 3);
             }
             
-            let setter = this.createUniformSetter(program, uniformInfo);
+            let setter = this.createUniformSetter(gl, program, uniformInfo);
             uniformSetters[name] = setter;
         }
 
@@ -166,5 +167,31 @@ class glbp {
     }
 
 
+
+
 }
 
+class glInit {
+    
+    public gl: WebGLRenderingContext;
+    public program: WebGLProgram;
+
+    constructor(gl: WebGLRenderingContext, program: WebGLProgram) {
+        this.gl = gl;
+        this.program = program;
+    }
+
+
+    public static init(canvasId: string, vertexShaderId: string, fragmentShaderId: string) : glInit {
+        let gl = glbp.createGlContext("gl-canvas");
+        let program = glbp.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
+        gl.useProgram(program);
+
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        return new glInit(gl, program);
+    }
+
+
+
+}
