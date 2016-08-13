@@ -58,19 +58,18 @@ function drawScene() {
     let mat_r = GlMatrix.rotation(rotation);
     let mat_s = GlMatrix.scale(scale[0], scale[1]);
 
-    // start with identity
-    var mat = GlMatrix.identity();
+    // move origin to centre
+    var mat = GlMatrix.translation(-50, -75);
+    
+    // multiply matrices
+    mat = GlMatrix.matrixMultiply(mat, mat_s)
+    mat = GlMatrix.matrixMultiply(mat, mat_r);
+    mat = GlMatrix.matrixMultiply(mat, mat_t);
 
-    for (var i = 0; i < 5; i++) {
-        // multiply matrices
-        mat = GlMatrix.matrixMultiply(mat, mat_s)
-        mat = GlMatrix.matrixMultiply(mat, mat_r);
-        mat = GlMatrix.matrixMultiply(mat, mat_t);
+    gl.uniformMatrix3fv(u_matrix, false, mat);
 
-        gl.uniformMatrix3fv(u_matrix, false, mat);
-
-        gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
-    }
+    gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
+   
 }
 
 function update() {
