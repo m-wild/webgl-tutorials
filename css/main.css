@@ -9,6 +9,7 @@ body {
 canvas {
     border: 1px solid #e6e6e6;
     background-color: #fff;
+    box-shadow: 0px 0px 5px #e6e6e6;
 }
 a         { color: #8494c1; text-decoration: none; }
 a:visited { color: #ae84c1; }
