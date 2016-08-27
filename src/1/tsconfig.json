@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outFile": "./js/1/index.js",
+        "outFile": "../../js/1/index.js",
         "watch": true,
         "sourceMap": true
     }
