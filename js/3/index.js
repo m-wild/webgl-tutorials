@@ -53,6 +53,53 @@ var GlAttribute = (function () {
     };
     return GlAttribute;
 }());
+var GlVector = (function () {
+    function GlVector() {
+    }
+    GlVector.cross = function (a, b) {
+        return new Float32Array([
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0]
+        ]);
+    };
+    GlVector.subtract = function (a, b) {
+        return new Float32Array([
+            a[0] - b[0],
+            a[1] - b[1],
+            a[2] - b[2]
+        ]);
+    };
+    GlVector.normalize = function (v) {
+        var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        // make sure we dont divide by zero
+        return (length < 0.00001)
+            ? new Float32Array([0, 0, 0])
+            : new Float32Array([
+                v[0] / length,
+                v[1] / length,
+                v[2] / length
+            ]);
+    };
+    return GlVector;
+}());
+/// <reference path="GlVector.ts" />
+var GlCamera = (function () {
+    function GlCamera() {
+    }
+    GlCamera.lookAt = function (cameraPosition, target, up) {
+        var zAxis = GlVector.normalize(GlVector.subtract(new Float32Array(cameraPosition), new Float32Array(target)));
+        var xAxis = GlVector.cross(new Float32Array(up), zAxis);
+        var yAxis = GlVector.cross(zAxis, xAxis);
+        return new Float32Array([
+            xAxis[0], xAxis[1], xAxis[2], 0,
+            yAxis[0], yAxis[1], yAxis[2], 0,
+            zAxis[0], zAxis[1], zAxis[2], 0,
+            cameraPosition[0], cameraPosition[1], cameraPosition[2], 1
+        ]);
+    };
+    return GlCamera;
+}());
 var GlInit = (function () {
     function GlInit() {
     }
@@ -315,7 +362,8 @@ var GlMatrix3D = (function () {
             a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30,
             a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31,
             a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32,
-            a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33]);
+            a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33
+        ]);
     };
     GlMatrix3D.inverse = function (m) {
         var m00 = m[0 * 4 + 0];
@@ -404,7 +452,7 @@ var util = (function () {
 /// <reference path="GlInit.ts" />
 /// <reference path="util.ts" />
 /// <reference path="GlAttribute.ts" />
-/// <reference path="GlMatrix2D.ts" />
+/// <reference path="GlCamera.ts" />
 // --- constants
 var x = 0, y = 1, z = 2;
 // --- initialization
@@ -434,9 +482,12 @@ var zFar = 2000;
 var aspect = canvas.clientWidth / canvas.clientHeight;
 // camera
 var cameraAngle = 0;
+var lockedOn = true;
 // initialize inputs
 var cameraAngle_input = document.getElementById("gl-cameraAngle");
+var lockedOn_input = document.getElementById("gl-lockedOn");
 cameraAngle_input.value = String(cameraAngle);
+lockedOn_input.checked = lockedOn;
 drawScene();
 function drawScene() {
     // clear the canvas
@@ -448,6 +499,15 @@ function drawScene() {
     // compute the camera's matrix
     var mat_camera = GlMatrix3D.translation(0, 0, radius * 1.5);
     mat_camera = GlMatrix3D.multiply(mat_camera, GlMatrix3D.rotationY(cameraAngle));
+    if (lockedOn) {
+        // extract the camera's position from the matrix
+        var cameraPosition = [mat_camera[12], mat_camera[13], mat_camera[14]];
+        // compute the position of the first 'F'
+        var fPosition = [radius, 0, 0];
+        var up = [0, 1, 0];
+        // make the camera look at the first 'F'
+        mat_camera = GlCamera.lookAt(cameraPosition, fPosition, up);
+    }
     // make a view matrix from the inverse of the camera
     var mat_view = GlMatrix3D.inverse(mat_camera);
     for (var i = 0; i < fCount; i++) {
@@ -467,6 +527,7 @@ function drawScene() {
 }
 function update() {
     cameraAngle = Number(cameraAngle_input.value);
+    lockedOn = lockedOn_input.checked;
     drawScene();
 }
 function setColors() {

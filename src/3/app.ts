@@ -1,7 +1,8 @@
 /// <reference path="GlInit.ts" />
 /// <reference path="util.ts" />
 /// <reference path="GlAttribute.ts" />
-/// <reference path="GlMatrix2D.ts" />
+/// <reference path="GlCamera.ts" />
+
 
 // --- constants
 const x = 0, y = 1, z = 2;
@@ -44,10 +45,14 @@ const aspect = canvas.clientWidth / canvas.clientHeight;
 
 // camera
 let cameraAngle = 0;
+let lockedOn = true;
 
 // initialize inputs
 let cameraAngle_input = <HTMLInputElement> document.getElementById("gl-cameraAngle");
+let lockedOn_input = <HTMLInputElement> document.getElementById("gl-lockedOn");
+
 cameraAngle_input.value = String(cameraAngle);
+lockedOn_input.checked = lockedOn;
 
 
 
@@ -60,12 +65,25 @@ function drawScene() {
     let fCount = 5;
     let radius = 200;
 
+
+
     // compute projection matrix
     let mat_projection = GlMatrix3D.perspective(fov, aspect, zNear, zFar);
     
     // compute the camera's matrix
     let mat_camera = GlMatrix3D.translation(0, 0, radius * 1.5);
     mat_camera = GlMatrix3D.multiply(mat_camera, GlMatrix3D.rotationY(cameraAngle));
+
+    if (lockedOn) {
+        // extract the camera's position from the matrix
+        let cameraPosition = [mat_camera[12], mat_camera[13], mat_camera[14]];
+        // compute the position of the first 'F'
+        var fPosition = [radius, 0, 0];
+        let up = [0, 1, 0];
+
+        // make the camera look at the first 'F'
+        mat_camera = GlCamera.lookAt(cameraPosition, fPosition, up);
+    }
 
     // make a view matrix from the inverse of the camera
     let mat_view = GlMatrix3D.inverse(mat_camera);
@@ -93,6 +111,7 @@ function drawScene() {
 
 function update() {
     cameraAngle = Number(cameraAngle_input.value);
+    lockedOn = lockedOn_input.checked;
 
     drawScene();
 }
