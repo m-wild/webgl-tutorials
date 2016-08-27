@@ -88,8 +88,7 @@ var GlInit = (function () {
         return this.createProgram(gl, vertexShader, fragmentShader);
     };
     /** Creates a WebGLRenderingContext from a canvas tag */
-    GlInit.createGlContext = function (canvasId) {
-        var canvas = document.getElementById(canvasId);
+    GlInit.createGlContext = function (canvas) {
         var gl = canvas.getContext("webgl");
         if (!gl) {
             throw ("No WebGL for you!");
@@ -106,6 +105,15 @@ var GlMatrix = (function () {
             1, 0, 0,
             0, 1, 0,
             0, 0, 1
+        ]);
+    };
+    // return a projection matrix
+    // note that this flips the Y axis so that 0 is at the top
+    GlMatrix.projection = function (width, height) {
+        return new Float32Array([
+            2 / width, 0, 0,
+            0, -2 / height, 0,
+            -1, 1, 1
         ]);
     };
     GlMatrix.translation = function (tx, ty) {
@@ -182,7 +190,8 @@ var util = (function () {
 /// <reference path="GlAttribute.ts" />
 /// <reference path="GlMatrix.ts" />
 // --- initialization
-var gl = GlInit.createGlContext("gl-canvas");
+var canvas = document.getElementById("gl-canvas");
+var gl = GlInit.createGlContext(canvas);
 var program = GlInit.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
 gl.useProgram(program);
 gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -216,6 +225,7 @@ function drawScene() {
     // clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
     // compute matrices
+    var mat_p = GlMatrix.projection(canvas.clientWidth, canvas.clientHeight);
     var mat_t = GlMatrix.translation(translation[0], translation[1]);
     var mat_r = GlMatrix.rotation(rotation);
     var mat_s = GlMatrix.scale(scale[0], scale[1]);
@@ -225,6 +235,7 @@ function drawScene() {
     mat = GlMatrix.matrixMultiply(mat, mat_s);
     mat = GlMatrix.matrixMultiply(mat, mat_r);
     mat = GlMatrix.matrixMultiply(mat, mat_t);
+    mat = GlMatrix.matrixMultiply(mat, mat_p);
     gl.uniformMatrix3fv(u_matrix, false, mat);
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
 }

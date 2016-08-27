@@ -5,8 +5,8 @@
 
 
 // --- initialization
-
-let gl = GlInit.createGlContext("gl-canvas");
+let canvas = <HTMLCanvasElement>document.getElementById("gl-canvas");
+let gl = GlInit.createGlContext(canvas);
 let program = GlInit.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
 gl.useProgram(program);
 
@@ -54,6 +54,7 @@ function drawScene() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // compute matrices
+    let mat_p = GlMatrix.projection(canvas.clientWidth, canvas.clientHeight);
     let mat_t = GlMatrix.translation(translation[0], translation[1]);
     let mat_r = GlMatrix.rotation(rotation);
     let mat_s = GlMatrix.scale(scale[0], scale[1]);
@@ -65,6 +66,7 @@ function drawScene() {
     mat = GlMatrix.matrixMultiply(mat, mat_s)
     mat = GlMatrix.matrixMultiply(mat, mat_r);
     mat = GlMatrix.matrixMultiply(mat, mat_t);
+    mat = GlMatrix.matrixMultiply(mat, mat_p);
 
     gl.uniformMatrix3fv(u_matrix, false, mat);
 

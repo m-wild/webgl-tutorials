@@ -64,8 +64,7 @@ class GlInit {
 
 
     /** Creates a WebGLRenderingContext from a canvas tag */
-    public static createGlContext(canvasId: string) : WebGLRenderingContext {
-        let canvas = <HTMLCanvasElement>document.getElementById(canvasId);
+    public static createGlContext(canvas: HTMLCanvasElement) : WebGLRenderingContext {
         let gl = <WebGLRenderingContext>canvas.getContext("webgl");
         if (!gl) {
             throw("No WebGL for you!");
