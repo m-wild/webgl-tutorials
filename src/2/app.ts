@@ -35,10 +35,16 @@ setGeometry();
 // set colors
 setColors();
 
-let translation = [150, 150, 0];
-let rotation = [20, 10, 340];
+// moving the objects
+let translation = [-50, 0, -360];
+let rotation = [160, 10, 340];
 let scale = [1, 1, 1];
-let fudgeFactor = 1;
+
+// perspective
+let fov = 60; // we can edit fov, but the others will stay static
+let zNear = 1;
+let zFar = 2000;
+let aspect = canvas.clientWidth / canvas.clientHeight;
 
 
 // initialize inputs
@@ -51,7 +57,7 @@ let rz_input = <HTMLInputElement> document.getElementById("gl-rz");
 let sx_input = <HTMLInputElement> document.getElementById("gl-sx");
 let sy_input = <HTMLInputElement> document.getElementById("gl-sy");
 let sz_input = <HTMLInputElement> document.getElementById("gl-sz");
-let ff_input = <HTMLInputElement> document.getElementById("gl-ff");
+let fov_input = <HTMLInputElement> document.getElementById("gl-fov");
 
 tx_input.value = String(translation[x]);
 ty_input.value = String(translation[y]);
@@ -62,7 +68,7 @@ rz_input.value = String(rotation[z]);
 sx_input.value = String(scale[x]);
 sy_input.value = String(scale[y]);
 sz_input.value = String(scale[z]);
-ff_input.value = String(fudgeFactor);
+fov_input.value = String(fov);
 
 
 drawScene();
@@ -72,8 +78,7 @@ function drawScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // compute matrices
-    let mat_p = GlMatrix3D.projection(canvas.clientWidth, canvas.clientHeight, 400);
-    let mat_z2w = GlMatrix3D.zToWMatrix(fudgeFactor);
+    let mat_pj = GlMatrix3D.perspective(fov, aspect, zNear, zFar);
     let mat_t = GlMatrix3D.translation(translation[x], translation[y], translation[z]);
     let mat_rx = GlMatrix3D.rotationX(rotation[x]);
     let mat_ry = GlMatrix3D.rotationY(rotation[y]);
@@ -81,18 +86,17 @@ function drawScene() {
     let mat_s = GlMatrix3D.scale(scale[x], scale[y], scale[z]);
 
     // move origin to centre
-    var mat = GlMatrix3D.translation(-50, -75, 0);
+    let mat = GlMatrix3D.translation(-50, -75, 0);
     
     // multiply matrices
     mat = GlMatrix3D.matrixMultiply(mat, mat_s)
-    mat = GlMatrix3D.matrixMultiply(mat, mat_rx);
-    mat = GlMatrix3D.matrixMultiply(mat, mat_ry);
     mat = GlMatrix3D.matrixMultiply(mat, mat_rz);
+    mat = GlMatrix3D.matrixMultiply(mat, mat_ry);
+    mat = GlMatrix3D.matrixMultiply(mat, mat_rx);
     mat = GlMatrix3D.matrixMultiply(mat, mat_t);
-    mat = GlMatrix3D.matrixMultiply(mat, mat_p);
 
-    // perspective
-    mat = GlMatrix3D.matrixMultiply(mat, mat_z2w);
+    // projection
+    mat = GlMatrix3D.matrixMultiply(mat, mat_pj);
 
     gl.uniformMatrix4fv(u_matrix, false, mat);
 
@@ -113,7 +117,7 @@ function update() {
     scale[y] = Number(sy_input.value);
     scale[z] = Number(sz_input.value);
 
-    fudgeFactor = Number(ff_input.value);
+    fov = Number(fov_input.value);
 
     drawScene();
 }

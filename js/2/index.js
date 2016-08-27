@@ -207,6 +207,17 @@ var GlMatrix3D = (function () {
             -1, 1, 0, 1
         ]);
     };
+    GlMatrix3D.perspective = function (fov, aspect, near, far) {
+        var fovRad = fov * Math.PI / 180;
+        var f = Math.tan(Math.PI * 0.5 - 0.5 * fovRad);
+        var rangeInv = 1.0 / (near - far);
+        return new Float32Array([
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (near + far) * rangeInv, -1,
+            0, 0, near * far * rangeInv * 2, 0
+        ]);
+    };
     GlMatrix3D.translation = function (tx, ty, tz) {
         return new Float32Array([
             1, 0, 0, 0,
@@ -253,14 +264,6 @@ var GlMatrix3D = (function () {
             sx, 0, 0, 0,
             0, sy, 0, 0,
             0, 0, sz, 0,
-            0, 0, 0, 1
-        ]);
-    };
-    GlMatrix3D.zToWMatrix = function (fudgeFactor) {
-        return new Float32Array([
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, fudgeFactor,
             0, 0, 0, 1
         ]);
     };
@@ -325,6 +328,12 @@ var util = (function () {
     util.randomColor = function (doUpdate) {
         return new Uint8Array([Math.random(), Math.random(), Math.random(), 1]);
     };
+    util.radToDeg = function (r) {
+        return r * 180 / Math.PI;
+    };
+    util.degToRad = function (d) {
+        return d * Math.PI / 180;
+    };
     return util;
 }());
 /// <reference path="GlInit.ts" />
@@ -353,10 +362,15 @@ var a_color = GlAttribute.get(program, "a_color", 3, gl.UNSIGNED_BYTE, true); //
 setGeometry();
 // set colors
 setColors();
-var translation = [150, 150, 0];
-var rotation = [20, 10, 340];
+// moving the objects
+var translation = [-50, 0, -360];
+var rotation = [160, 10, 340];
 var scale = [1, 1, 1];
-var fudgeFactor = 1;
+// perspective
+var fov = 60; // we can edit fov, but the others will stay static
+var zNear = 1;
+var zFar = 2000;
+var aspect = canvas.clientWidth / canvas.clientHeight;
 // initialize inputs
 var tx_input = document.getElementById("gl-tx");
 var ty_input = document.getElementById("gl-ty");
@@ -367,7 +381,7 @@ var rz_input = document.getElementById("gl-rz");
 var sx_input = document.getElementById("gl-sx");
 var sy_input = document.getElementById("gl-sy");
 var sz_input = document.getElementById("gl-sz");
-var ff_input = document.getElementById("gl-ff");
+var fov_input = document.getElementById("gl-fov");
 tx_input.value = String(translation[x]);
 ty_input.value = String(translation[y]);
 tz_input.value = String(translation[z]);
@@ -377,14 +391,13 @@ rz_input.value = String(rotation[z]);
 sx_input.value = String(scale[x]);
 sy_input.value = String(scale[y]);
 sz_input.value = String(scale[z]);
-ff_input.value = String(fudgeFactor);
+fov_input.value = String(fov);
 drawScene();
 function drawScene() {
     // clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // compute matrices
-    var mat_p = GlMatrix3D.projection(canvas.clientWidth, canvas.clientHeight, 400);
-    var mat_z2w = GlMatrix3D.zToWMatrix(fudgeFactor);
+    var mat_pj = GlMatrix3D.perspective(fov, aspect, zNear, zFar);
     var mat_t = GlMatrix3D.translation(translation[x], translation[y], translation[z]);
     var mat_rx = GlMatrix3D.rotationX(rotation[x]);
     var mat_ry = GlMatrix3D.rotationY(rotation[y]);
@@ -394,13 +407,12 @@ function drawScene() {
     var mat = GlMatrix3D.translation(-50, -75, 0);
     // multiply matrices
     mat = GlMatrix3D.matrixMultiply(mat, mat_s);
-    mat = GlMatrix3D.matrixMultiply(mat, mat_rx);
-    mat = GlMatrix3D.matrixMultiply(mat, mat_ry);
     mat = GlMatrix3D.matrixMultiply(mat, mat_rz);
+    mat = GlMatrix3D.matrixMultiply(mat, mat_ry);
+    mat = GlMatrix3D.matrixMultiply(mat, mat_rx);
     mat = GlMatrix3D.matrixMultiply(mat, mat_t);
-    mat = GlMatrix3D.matrixMultiply(mat, mat_p);
-    // perspective
-    mat = GlMatrix3D.matrixMultiply(mat, mat_z2w);
+    // projection
+    mat = GlMatrix3D.matrixMultiply(mat, mat_pj);
     gl.uniformMatrix4fv(u_matrix, false, mat);
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
 }
@@ -414,7 +426,7 @@ function update() {
     scale[x] = Number(sx_input.value);
     scale[y] = Number(sy_input.value);
     scale[z] = Number(sz_input.value);
-    fudgeFactor = Number(ff_input.value);
+    fov = Number(fov_input.value);
     drawScene();
 }
 function setColors() {
