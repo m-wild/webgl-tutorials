@@ -1,4 +1,4 @@
-class GlMatrix {
+class GlMatrix2D {
 
     public static identity(): Float32Array {
         return new Float32Array([
@@ -12,13 +12,12 @@ class GlMatrix {
     // note that this flips the Y axis so that 0 is at the top
     public static projection(width: number, height: number): Float32Array {
         return new Float32Array([
-            2 / width, 0, 0,
-            0, -2 / height, 0,
+            2/width, 0, 0,
+            0, -2/height, 0,
             -1, 1, 1
         ]);
     }
-
-
+    
     public static translation(tx: number, ty: number): Float32Array {
         return new Float32Array([
             1, 0, 0,
@@ -76,15 +75,5 @@ class GlMatrix {
                 a20 * b01 + a21 * b11 + a22 * b21,
                 a20 * b02 + a21 * b12 + a22 * b22]);
         }
-
-
-    public static matrixMultiply3(a: Float32Array, b: Float32Array, c: Float32Array): Float32Array {
-        return this.matrixMultiply(this.matrixMultiply(a, b), c);
-    }
-
-
-    public static matrixMultiply4(a: Float32Array, b: Float32Array, c: Float32Array, d: Float32Array): Float32Array {
-        return this.matrixMultiply(this.matrixMultiply(this.matrixMultiply(a, b), c), d);
-    }
 
 }
