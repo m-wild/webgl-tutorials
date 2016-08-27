@@ -15,6 +15,7 @@ gl.useProgram(program);
 gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 gl.enable(gl.CULL_FACE);
+gl.enable(gl.DEPTH_TEST);
 
 // get uniforms
 let u_resolution = gl.getUniformLocation(program, "u_resolution");
@@ -65,7 +66,7 @@ drawScene();
 
 function drawScene() {
     // clear the canvas
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // compute matrices
     let mat_p = GlMatrix3D.projection(canvas.clientWidth, canvas.clientHeight, 400);
@@ -372,138 +373,4 @@ function setGeometry() {
 
     a_position.bindBuff();
 }
-
-
-// nightmare fuel
-function newColor() {
-    a_color.data = new Uint8Array([   // left column front
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // top rung front
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-          // middle rung front
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // left column back
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // top rung back
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // middle rung back
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // top
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // top rung right
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // under top rung
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // between top rung and middle
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // top of middle rung
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // right of middle rung
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // bottom of middle rung.
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // right of bottom
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // bottom
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-
-          // left side
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255,
-        Math.random()*255,  Math.random()*255, Math.random()*255]);
-    a_color.bindBuff();
-    update();
-}
-
 
