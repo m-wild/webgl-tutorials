@@ -20,7 +20,6 @@ gl.enable(gl.DEPTH_TEST);
 // get uniforms
 let u_resolution = gl.getUniformLocation(program, "u_resolution");
 let u_matrix = gl.getUniformLocation(program, "u_matrix");
-let u_fudgeFactor = gl.getUniformLocation(program, "u_fudgeFactor");
 
 // set resolution
 gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
@@ -74,6 +73,7 @@ function drawScene() {
 
     // compute matrices
     let mat_p = GlMatrix3D.projection(canvas.clientWidth, canvas.clientHeight, 400);
+    let mat_z2w = GlMatrix3D.zToWMatrix(fudgeFactor);
     let mat_t = GlMatrix3D.translation(translation[x], translation[y], translation[z]);
     let mat_rx = GlMatrix3D.rotationX(rotation[x]);
     let mat_ry = GlMatrix3D.rotationY(rotation[y]);
@@ -91,10 +91,10 @@ function drawScene() {
     mat = GlMatrix3D.matrixMultiply(mat, mat_t);
     mat = GlMatrix3D.matrixMultiply(mat, mat_p);
 
-    gl.uniformMatrix4fv(u_matrix, false, mat);
+    // perspective
+    mat = GlMatrix3D.matrixMultiply(mat, mat_z2w);
 
-    // set the fudgeFactor
-    gl.uniform1f(u_fudgeFactor, fudgeFactor);
+    gl.uniformMatrix4fv(u_matrix, false, mat);
 
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
    

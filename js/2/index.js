@@ -256,6 +256,14 @@ var GlMatrix3D = (function () {
             0, 0, 0, 1
         ]);
     };
+    GlMatrix3D.zToWMatrix = function (fudgeFactor) {
+        return new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, fudgeFactor,
+            0, 0, 0, 1
+        ]);
+    };
     GlMatrix3D.matrixMultiply = function (a, b) {
         var a00 = a[0 * 4 + 0];
         var a01 = a[0 * 4 + 1];
@@ -336,7 +344,6 @@ gl.enable(gl.DEPTH_TEST);
 // get uniforms
 var u_resolution = gl.getUniformLocation(program, "u_resolution");
 var u_matrix = gl.getUniformLocation(program, "u_matrix");
-var u_fudgeFactor = gl.getUniformLocation(program, "u_fudgeFactor");
 // set resolution
 gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
 // get attributes
@@ -377,6 +384,7 @@ function drawScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // compute matrices
     var mat_p = GlMatrix3D.projection(canvas.clientWidth, canvas.clientHeight, 400);
+    var mat_z2w = GlMatrix3D.zToWMatrix(fudgeFactor);
     var mat_t = GlMatrix3D.translation(translation[x], translation[y], translation[z]);
     var mat_rx = GlMatrix3D.rotationX(rotation[x]);
     var mat_ry = GlMatrix3D.rotationY(rotation[y]);
@@ -391,9 +399,9 @@ function drawScene() {
     mat = GlMatrix3D.matrixMultiply(mat, mat_rz);
     mat = GlMatrix3D.matrixMultiply(mat, mat_t);
     mat = GlMatrix3D.matrixMultiply(mat, mat_p);
+    // perspective
+    mat = GlMatrix3D.matrixMultiply(mat, mat_z2w);
     gl.uniformMatrix4fv(u_matrix, false, mat);
-    // set the fudgeFactor
-    gl.uniform1f(u_fudgeFactor, fudgeFactor);
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
 }
 function update() {

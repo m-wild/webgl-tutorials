@@ -79,6 +79,15 @@ class GlMatrix3D {
         ]);
     }
 
+    public static zToWMatrix(fudgeFactor: number): Float32Array {
+        return new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, fudgeFactor,
+            0, 0, 0, 1
+        ]);
+    }
+
 
     public static matrixMultiply(a: Float32Array, b: Float32Array): Float32Array {
         var a00 = a[0*4+0];

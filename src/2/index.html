@@ -31,18 +31,11 @@
             attribute vec4 a_color;
 
             uniform mat4 u_matrix;
-            uniform float u_fudgeFactor;
 
             varying vec4 v_color;
 
             void main() {
-                vec4 position = u_matrix * a_position;
-
-                // adjust Z for division (fudge it)
-                float zz = 1.0 + position.z * u_fudgeFactor;
-
-                // divide X, Y, and  Z by our perspective ZZ
-                gl_Position = vec4(position.xyz, zz);
+                gl_Position = u_matrix * a_position;
 
                 // pass color to the fragment shader
                 v_color = a_color;
