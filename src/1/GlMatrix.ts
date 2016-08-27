@@ -8,6 +8,17 @@ class GlMatrix {
         ]);
     }
 
+    // return a projection matrix
+    // note that this flips the Y axis so that 0 is at the top
+    public static projection(width: number, height: number): Float32Array {
+        return new Float32Array([
+            2 / width, 0, 0,
+            0, -2 / height, 0,
+            -1, 1, 1
+        ]);
+    }
+
+
     public static translation(tx: number, ty: number): Float32Array {
         return new Float32Array([
             1, 0, 0,

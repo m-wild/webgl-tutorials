@@ -24,21 +24,10 @@
         <script id="gl-vertexShader" type="glsl">
             attribute vec2 a_position;
 
-            uniform vec2 u_resolution;
             uniform mat3 u_matrix;
 
             void main() {
-                
-                vec2 position = (u_matrix * vec3(a_position, 1)).xy;
-
-                // convert the position from pixels 
-                vec2 clipspace = (((
-                    position / u_resolution)    // to 0->1
-                    * 2.0)                      // then to 0->2
-                    - 1.0)                      // then to -1->+1 (clipspace)
-                    * vec2(1, -1);              // then flip y-axis
-                
-                gl_Position = vec4(clipspace, 0, 1);
+                gl_Position = vec4((u_matrix * vec3(a_position, 1)).xy, 0, 1);
             }       
         </script>
         
