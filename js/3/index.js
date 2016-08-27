@@ -267,7 +267,7 @@ var GlMatrix3D = (function () {
             0, 0, 0, 1
         ]);
     };
-    GlMatrix3D.matrixMultiply = function (a, b) {
+    GlMatrix3D.multiply = function (a, b) {
         var a00 = a[0 * 4 + 0];
         var a01 = a[0 * 4 + 1];
         var a02 = a[0 * 4 + 2];
@@ -317,6 +317,71 @@ var GlMatrix3D = (function () {
             a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32,
             a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33]);
     };
+    GlMatrix3D.inverse = function (m) {
+        var m00 = m[0 * 4 + 0];
+        var m01 = m[0 * 4 + 1];
+        var m02 = m[0 * 4 + 2];
+        var m03 = m[0 * 4 + 3];
+        var m10 = m[1 * 4 + 0];
+        var m11 = m[1 * 4 + 1];
+        var m12 = m[1 * 4 + 2];
+        var m13 = m[1 * 4 + 3];
+        var m20 = m[2 * 4 + 0];
+        var m21 = m[2 * 4 + 1];
+        var m22 = m[2 * 4 + 2];
+        var m23 = m[2 * 4 + 3];
+        var m30 = m[3 * 4 + 0];
+        var m31 = m[3 * 4 + 1];
+        var m32 = m[3 * 4 + 2];
+        var m33 = m[3 * 4 + 3];
+        var tmp_0 = m22 * m33;
+        var tmp_1 = m32 * m23;
+        var tmp_2 = m12 * m33;
+        var tmp_3 = m32 * m13;
+        var tmp_4 = m12 * m23;
+        var tmp_5 = m22 * m13;
+        var tmp_6 = m02 * m33;
+        var tmp_7 = m32 * m03;
+        var tmp_8 = m02 * m23;
+        var tmp_9 = m22 * m03;
+        var tmp_10 = m02 * m13;
+        var tmp_11 = m12 * m03;
+        var tmp_12 = m20 * m31;
+        var tmp_13 = m30 * m21;
+        var tmp_14 = m10 * m31;
+        var tmp_15 = m30 * m11;
+        var tmp_16 = m10 * m21;
+        var tmp_17 = m20 * m11;
+        var tmp_18 = m00 * m31;
+        var tmp_19 = m30 * m01;
+        var tmp_20 = m00 * m21;
+        var tmp_21 = m20 * m01;
+        var tmp_22 = m00 * m11;
+        var tmp_23 = m10 * m01;
+        var t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) - (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
+        var t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) - (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
+        var t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
+        var t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
+        var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
+        return new Float32Array([
+            d * t0,
+            d * t1,
+            d * t2,
+            d * t3,
+            d * ((tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30) - (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30)),
+            d * ((tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30) - (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30)),
+            d * ((tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30) - (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30)),
+            d * ((tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20) - (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20)),
+            d * ((tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33) - (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33)),
+            d * ((tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33) - (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33)),
+            d * ((tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33) - (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33)),
+            d * ((tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23) - (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23)),
+            d * ((tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12) - (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22)),
+            d * ((tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22) - (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02)),
+            d * ((tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02) - (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12)),
+            d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) - (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02))
+        ]);
+    };
     return GlMatrix3D;
 }());
 var util = (function () {
@@ -362,36 +427,16 @@ var a_color = GlAttribute.get(program, "a_color", 3, gl.UNSIGNED_BYTE, true); //
 setGeometry();
 // set colors
 setColors();
-// moving the objects
-var translation = [-50, 0, -360];
-var rotation = [160, 10, 340];
-var scale = [1, 1, 1];
 // perspective
 var fov = 60; // we can edit fov, but the others will stay static
 var zNear = 1;
 var zFar = 2000;
 var aspect = canvas.clientWidth / canvas.clientHeight;
+// camera
+var cameraAngle = 0;
 // initialize inputs
-var tx_input = document.getElementById("gl-tx");
-var ty_input = document.getElementById("gl-ty");
-var tz_input = document.getElementById("gl-tz");
-var rx_input = document.getElementById("gl-rx");
-var ry_input = document.getElementById("gl-ry");
-var rz_input = document.getElementById("gl-rz");
-var sx_input = document.getElementById("gl-sx");
-var sy_input = document.getElementById("gl-sy");
-var sz_input = document.getElementById("gl-sz");
-var fov_input = document.getElementById("gl-fov");
-tx_input.value = String(translation[x]);
-ty_input.value = String(translation[y]);
-tz_input.value = String(translation[z]);
-rx_input.value = String(rotation[x]);
-ry_input.value = String(rotation[y]);
-rz_input.value = String(rotation[z]);
-sx_input.value = String(scale[x]);
-sy_input.value = String(scale[y]);
-sz_input.value = String(scale[z]);
-fov_input.value = String(fov);
+var cameraAngle_input = document.getElementById("gl-cameraAngle");
+cameraAngle_input.value = String(cameraAngle);
 drawScene();
 function drawScene() {
     // clear the canvas
@@ -399,14 +444,21 @@ function drawScene() {
     var fCount = 5;
     var radius = 200;
     // compute projection matrix
-    var mat_pj = GlMatrix3D.perspective(fov, aspect, zNear, zFar);
+    var mat_projection = GlMatrix3D.perspective(fov, aspect, zNear, zFar);
+    // compute the camera's matrix
+    var mat_camera = GlMatrix3D.translation(0, 0, radius * 1.5);
+    mat_camera = GlMatrix3D.multiply(mat_camera, GlMatrix3D.rotationY(cameraAngle));
+    // make a view matrix from the inverse of the camera
+    var mat_view = GlMatrix3D.inverse(mat_camera);
     for (var i = 0; i < fCount; i++) {
         var angle = i * Math.PI * 2 / fCount;
         var x_1 = Math.cos(angle) * radius;
         var z_1 = Math.sin(angle) * radius;
+        var mat_translation = GlMatrix3D.translation(x_1, 0, z_1);
         // multiply the matrices
-        var mat_t = GlMatrix3D.translation(x_1, 0, z_1);
-        var mat = GlMatrix3D.matrixMultiply(mat_t, mat_pj);
+        var mat = mat_translation;
+        mat = GlMatrix3D.multiply(mat, mat_view);
+        mat = GlMatrix3D.multiply(mat, mat_projection);
         // set the matrix
         gl.uniformMatrix4fv(u_matrix, false, mat);
         // and draw the geometry
@@ -414,16 +466,7 @@ function drawScene() {
     }
 }
 function update() {
-    translation[x] = Number(tx_input.value);
-    translation[y] = Number(ty_input.value);
-    translation[z] = Number(tz_input.value);
-    rotation[x] = Number(rx_input.value);
-    rotation[y] = Number(ry_input.value);
-    rotation[z] = Number(rz_input.value);
-    scale[x] = Number(sx_input.value);
-    scale[y] = Number(sy_input.value);
-    scale[z] = Number(sz_input.value);
-    fov = Number(fov_input.value);
+    cameraAngle = Number(cameraAngle_input.value);
     drawScene();
 }
 function setColors() {
@@ -543,7 +586,7 @@ function setColors() {
 }
 function setGeometry() {
     // set up the scene
-    a_position.data = new Float32Array([
+    var positions = [
         // left column front
         0, 0, 0,
         0, 150, 0,
@@ -655,7 +698,28 @@ function setGeometry() {
         0, 150, 30,
         0, 0, 0,
         0, 150, 30,
-        0, 150, 0]);
+        0, 150, 0];
+    // flip this so that +Y is up
+    // we started in 2d where +Y was down..
+    var mat = GlMatrix3D.translation(-50, -75, -15);
+    mat = GlMatrix3D.multiply(mat, GlMatrix3D.rotationX(util.radToDeg(Math.PI)));
+    for (var ii = 0; ii < positions.length; ii += 3) {
+        var vector = matrixVectorMultiply([positions[ii + 0], positions[ii + 1], positions[ii + 2], 1], mat);
+        positions[ii + 0] = vector[0];
+        positions[ii + 1] = vector[1];
+        positions[ii + 2] = vector[2];
+    }
+    a_position.data = new Float32Array(positions);
     a_position.bindBuff();
 }
+function matrixVectorMultiply(v, m) {
+    var dst = [];
+    for (var i = 0; i < 4; ++i) {
+        dst[i] = 0.0;
+        for (var j = 0; j < 4; ++j)
+            dst[i] += v[j] * m[j * 4 + i];
+    }
+    return dst;
+}
+;
 //# sourceMappingURL=index.js.map
