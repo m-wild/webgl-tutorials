@@ -331,6 +331,7 @@ var gl = GlInit.createGlContext(canvas);
 var program = GlInit.createProgramFromScripts(gl, "gl-vertexShader", "gl-fragmentShader");
 gl.useProgram(program);
 gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+gl.enable(gl.CULL_FACE);
 // get uniforms
 var u_resolution = gl.getUniformLocation(program, "u_resolution");
 var u_matrix = gl.getUniformLocation(program, "u_matrix");
@@ -520,25 +521,25 @@ function setGeometry() {
     a_position.data = new Float32Array([
         // left column front
         0, 0, 0,
-        30, 0, 0,
-        0, 150, 0,
         0, 150, 0,
         30, 0, 0,
+        0, 150, 0,
         30, 150, 0,
+        30, 0, 0,
         // top rung front
         30, 0, 0,
-        100, 0, 0,
-        30, 30, 0,
         30, 30, 0,
         100, 0, 0,
+        30, 30, 0,
         100, 30, 0,
+        100, 0, 0,
         // middle rung front
         30, 60, 0,
-        67, 60, 0,
-        30, 90, 0,
         30, 90, 0,
         67, 60, 0,
+        30, 90, 0,
         67, 90, 0,
+        67, 60, 0,
         // left column back
         0, 0, 30,
         30, 0, 30,
@@ -583,25 +584,25 @@ function setGeometry() {
         100, 30, 0,
         // between top rung and middle
         30, 30, 0,
+        30, 60, 30,
         30, 30, 30,
-        30, 60, 30,
         30, 30, 0,
-        30, 60, 30,
         30, 60, 0,
+        30, 60, 30,
         // top of middle rung
         30, 60, 0,
+        67, 60, 30,
         30, 60, 30,
-        67, 60, 30,
         30, 60, 0,
-        67, 60, 30,
         67, 60, 0,
+        67, 60, 30,
         // right of middle rung
         67, 60, 0,
+        67, 90, 30,
         67, 60, 30,
-        67, 90, 30,
         67, 60, 0,
-        67, 90, 30,
         67, 90, 0,
+        67, 90, 30,
         // bottom of middle rung.
         30, 90, 0,
         30, 90, 30,
@@ -611,11 +612,11 @@ function setGeometry() {
         67, 90, 0,
         // right of bottom
         30, 90, 0,
+        30, 150, 30,
         30, 90, 30,
-        30, 150, 30,
         30, 90, 0,
-        30, 150, 30,
         30, 150, 0,
+        30, 150, 30,
         // bottom
         0, 150, 0,
         0, 150, 30,
