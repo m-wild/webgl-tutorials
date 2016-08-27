@@ -20,6 +20,7 @@ gl.enable(gl.DEPTH_TEST);
 // get uniforms
 let u_resolution = gl.getUniformLocation(program, "u_resolution");
 let u_matrix = gl.getUniformLocation(program, "u_matrix");
+let u_fudgeFactor = gl.getUniformLocation(program, "u_fudgeFactor");
 
 // set resolution
 gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
@@ -38,6 +39,7 @@ setColors();
 let translation = [150, 150, 0];
 let rotation = [20, 10, 340];
 let scale = [1, 1, 1];
+let fudgeFactor = 1;
 
 
 // initialize inputs
@@ -50,6 +52,7 @@ let rz_input = <HTMLInputElement> document.getElementById("gl-rz");
 let sx_input = <HTMLInputElement> document.getElementById("gl-sx");
 let sy_input = <HTMLInputElement> document.getElementById("gl-sy");
 let sz_input = <HTMLInputElement> document.getElementById("gl-sz");
+let ff_input = <HTMLInputElement> document.getElementById("gl-ff");
 
 tx_input.value = String(translation[x]);
 ty_input.value = String(translation[y]);
@@ -60,6 +63,7 @@ rz_input.value = String(rotation[z]);
 sx_input.value = String(scale[x]);
 sy_input.value = String(scale[y]);
 sz_input.value = String(scale[z]);
+ff_input.value = String(fudgeFactor);
 
 
 drawScene();
@@ -89,6 +93,9 @@ function drawScene() {
 
     gl.uniformMatrix4fv(u_matrix, false, mat);
 
+    // set the fudgeFactor
+    gl.uniform1f(u_fudgeFactor, fudgeFactor);
+
     gl.drawArrays(gl.TRIANGLES, 0, (a_position.data.length / a_position.size));
    
 }
@@ -105,6 +112,8 @@ function update() {
     scale[x] = Number(sx_input.value);
     scale[y] = Number(sy_input.value);
     scale[z] = Number(sz_input.value);
+
+    fudgeFactor = Number(ff_input.value);
 
     drawScene();
 }
