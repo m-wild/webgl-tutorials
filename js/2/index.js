@@ -1,38 +1,53 @@
 /** GlAttribute class for managing WebGL attribues */
 var GlAttribute = (function () {
-    function GlAttribute(index, buffer, size) {
+    function GlAttribute(index, buffer) {
         this.index = index;
         this.buffer = buffer;
-        this.size = size;
-        this.normalized = false;
+        this.size = 3;
         this.type = gl.FLOAT;
+        this.normalized = false;
         this.stride = 0;
         this.offset = 0;
         this.usage = gl.STATIC_DRAW;
         this.targetBuffer = gl.ARRAY_BUFFER;
     }
     /** get a webgl attribute
-     * @param  program  the webgl program
-     * @param  name     the attribute name
-     * @param  size     size of data in the attribute
+     * @param  program     the webgl program
+     * @param  name        the attribute name
+     * @param  size        size of data in the attribute
+     * @param  type        the type of data in the attribute
+     * @param  normalized  is the data normalized?
      */
-    GlAttribute.get = function (program, name, size) {
+    GlAttribute.get = function (program, name, size, type, normalized) {
         var p_attrib = gl.getAttribLocation(program, name);
         var buffer = gl.createBuffer();
-        return new GlAttribute(p_attrib, buffer, size);
+        var ret = new GlAttribute(p_attrib, buffer);
+        if (size)
+            ret.size = size;
+        if (type)
+            ret.type = type;
+        if (normalized)
+            ret.normalized = normalized;
+        return ret;
     };
     /** bind this attibute to targetBuffer */
     GlAttribute.prototype.bind = function () {
+        // this lets us get ready to send data to the target buffer      
         gl.bindBuffer(this.targetBuffer, this.buffer);
         gl.enableVertexAttribArray(this.index);
         gl.vertexAttribPointer(this.index, this.size, this.type, this.normalized, this.stride, this.offset);
     };
     /** buffer this attribues data */
     GlAttribute.prototype.buff = function () {
+        // sends data to the target buffer
+        // note that the target buffer is shared (e.g. gl.ARRAY_BUFFER)
+        // so we need to bind it first (by calling this.bind()) 
         gl.bufferData(this.targetBuffer, this.data, this.usage);
     };
     /** bind this attibute to targetBuffer and buffer the data */
     GlAttribute.prototype.bindBuff = function () {
+        // this just helps us to bind the buffer and then immediately
+        // buffer data without accidentally un-binding the buffer 
         this.bind();
         this.buff();
     };
@@ -299,6 +314,9 @@ var util = (function () {
     util.randomInt = function (range) {
         return Math.floor(Math.random() * range);
     };
+    util.randomColor = function (doUpdate) {
+        return new Uint8Array([Math.random(), Math.random(), Math.random(), 1]);
+    };
     return util;
 }());
 /// <reference path="GlInit.ts" />
@@ -315,15 +333,16 @@ gl.useProgram(program);
 gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 // get uniforms
 var u_resolution = gl.getUniformLocation(program, "u_resolution");
-var u_color = gl.getUniformLocation(program, "u_color");
 var u_matrix = gl.getUniformLocation(program, "u_matrix");
 // set resolution
 gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
 // get attributes
-var a_position = GlAttribute.get(program, "a_position", 3);
+var a_position = GlAttribute.get(program, "a_position");
+var a_color = GlAttribute.get(program, "a_color", 3, gl.UNSIGNED_BYTE, true); // RGB bytes
 // set the geometry
 setGeometry();
-newColor(false);
+// set colors
+setColors();
 var translation = [150, 150, 0];
 var rotation = [20, 10, 340];
 var scale = [1, 1, 1];
@@ -381,10 +400,120 @@ function update() {
     scale[z] = Number(sz_input.value);
     drawScene();
 }
-function newColor(doUpdate) {
-    gl.uniform4f(u_color, Math.random(), Math.random(), Math.random(), 1);
-    if (doUpdate)
-        update();
+function setColors() {
+    a_color.data = new Uint8Array([
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        // top rung front
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        // middle rung front
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        200, 70, 120,
+        // left column back
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        // top rung back
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        // middle rung back
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        80, 70, 200,
+        // top
+        70, 200, 210,
+        70, 200, 210,
+        70, 200, 210,
+        70, 200, 210,
+        70, 200, 210,
+        70, 200, 210,
+        // top rung right
+        200, 200, 70,
+        200, 200, 70,
+        200, 200, 70,
+        200, 200, 70,
+        200, 200, 70,
+        200, 200, 70,
+        // under top rung
+        210, 100, 70,
+        210, 100, 70,
+        210, 100, 70,
+        210, 100, 70,
+        210, 100, 70,
+        210, 100, 70,
+        // between top rung and middle
+        210, 160, 70,
+        210, 160, 70,
+        210, 160, 70,
+        210, 160, 70,
+        210, 160, 70,
+        210, 160, 70,
+        // top of middle rung
+        70, 180, 210,
+        70, 180, 210,
+        70, 180, 210,
+        70, 180, 210,
+        70, 180, 210,
+        70, 180, 210,
+        // right of middle rung
+        100, 70, 210,
+        100, 70, 210,
+        100, 70, 210,
+        100, 70, 210,
+        100, 70, 210,
+        100, 70, 210,
+        // bottom of middle rung.
+        76, 210, 100,
+        76, 210, 100,
+        76, 210, 100,
+        76, 210, 100,
+        76, 210, 100,
+        76, 210, 100,
+        // right of bottom
+        140, 210, 80,
+        140, 210, 80,
+        140, 210, 80,
+        140, 210, 80,
+        140, 210, 80,
+        140, 210, 80,
+        // bottom
+        90, 130, 110,
+        90, 130, 110,
+        90, 130, 110,
+        90, 130, 110,
+        90, 130, 110,
+        90, 130, 110,
+        // left side
+        160, 160, 220,
+        160, 160, 220,
+        160, 160, 220,
+        160, 160, 220,
+        160, 160, 220,
+        160, 160, 220]);
+    a_color.bindBuff();
 }
 function setGeometry() {
     // set up the scene
@@ -502,5 +631,122 @@ function setGeometry() {
         0, 150, 30,
         0, 150, 0]);
     a_position.bindBuff();
+}
+// nightmare fuel
+function newColor() {
+    a_color.data = new Uint8Array([
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // top rung front
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // middle rung front
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // left column back
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // top rung back
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // middle rung back
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // top
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // top rung right
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // under top rung
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // between top rung and middle
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // top of middle rung
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // right of middle rung
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // bottom of middle rung.
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // right of bottom
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // bottom
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        // left side
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255,
+        Math.random() * 255, Math.random() * 255, Math.random() * 255]);
+    a_color.bindBuff();
+    update();
 }
 //# sourceMappingURL=index.js.map
